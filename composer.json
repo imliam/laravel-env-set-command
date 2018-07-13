@@ -1,0 +1,40 @@
+{
+    "name": "imliam/laravel-env-set-command",
+    "description": "Set a .env file variable from the command line",
+    "keywords": [
+        "imliam",
+        "laravel-env-set-command",
+        "environment",
+        "variables",
+        "env",
+        "artisan"
+    ],
+    "homepage": "https://github.com/imliam/laravel-env-set-command",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Liam Hammett",
+            "email": "liam@liamhammett.com",
+            "homepage": "https://liamhammett.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "ImLiam\\EnvironmentSetCommand\\": "src"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ImLiam\\EnvironmentSetCommand\\EnvironmentSetCommandServiceProvider"
+            ]
+        }
+    }
+}
