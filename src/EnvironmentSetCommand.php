@@ -105,14 +105,7 @@ class EnvironmentSetCommand extends Command
         $value = $this->argument('value');
 
         if (! $value) {
-            $parts = explode('=', $key, 2);
-
-            if (count($parts) !== 2) {
-                throw new InvalidArgumentException('No value was set');
-            }
-
-            $key = $parts[0];
-            $value = $parts[1];
+            $value = ' ';
         }
 
         if (! $this->isValidKey($key)) {
