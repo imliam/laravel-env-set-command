@@ -48,10 +48,10 @@ class EnvironmentSetCommand extends Command
         $contents = file_get_contents($envFilePath);
 
         if ($oldValue = $this->getOldValue($contents, $key)) {
-            $contents = str_replace("{$key}={$oldValue}", "{$key}={$value}", $contents);
+            $contents = str_replace("{$oldValue}", "{$key}={$value}", $contents);
             $this->writeFile($envFilePath, $contents);
 
-            return $this->info("Environment variable with key '{$key}' has been changed from '{$oldValue}' to '{$value}'");
+            return $this->info("Environment variable with key '{$key}' has been updated to '{$value}'");
         }
 
         $contents = $contents . "\n{$key}={$value}\n";
@@ -88,7 +88,7 @@ class EnvironmentSetCommand extends Command
         preg_match("/^{$key}=[^\r\n]*/m", $envFile, $matches);
 
         if (count($matches)) {
-            return substr($matches[0], strlen($key) + 1);
+            return $matches[0];
         }
 
         return '';
