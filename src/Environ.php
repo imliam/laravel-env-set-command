@@ -61,25 +61,9 @@ class Environ extends Command
     }
 
 
-
     /**
-     * Overwrite the contents of a file.
-     *
-     * @param string $path
-     * @param string $contents
-     * @return boolean
-     */
-    protected static function writeFile(string $path, string $contents): bool
-    {
-        $file = fopen($path, 'w');
-
-        fwrite($file, $contents);
-
-        return fclose($file);
-    }
-
-    /**
-     * Get the old value of a given key from an environment file.
+     * Get the value of a given key from an environment file.
+     * or null if not defined
      *
      * @param string $envFile
      * @param string $key
@@ -87,21 +71,18 @@ class Environ extends Command
     public static function getValue(string $envFile, string $key)
     {
         $contents = static::getFileContents($envFile, true);
-        
+
         // Match the given key at the beginning of a line
-        preg_match("/$key=(.*)$/", $contents, $matches);
+        preg_match("/^$key=(.*)$/", $contents, $matches);
 
         return $matches[1] ?? null;
     }
-    
-    public static function getFileContents($file, $create = false){
-        if(!file_exists($file)){
-            touch($file);
-        }
-        
+
+    public static function getFileContents($file, $create = false)
+    {
         return file_get_contents($file);
     }
-    
+
 
     /**
      * Determine what the supplied key and value is from the current command.
@@ -163,26 +144,28 @@ class Environ extends Command
 
     public static function updateOrCreate($key, $value, $file_path)
     {
-        $contents = file_get_contents($file_path);
-        $oldValue = static::getValue($file_path, $key);
+        $lines = explode("\n", file_get_contents($file_path));
+        $data = [];
+        $contents = "";
+        foreach($lines as $line){
+            if (!empty($line)) {
+                [$index, $v] = explode("=", $line);
+                $data[$index] = $v;
+            }
+        }
 
+        $data[$key] = $value;
 
-
-        if (!is_null($oldValue)) {
-
-            $contents = str_replace("{$key}={$oldValue}", "{$key}={$value}", $contents);
-
-        } else {
-
-            $contents = $contents . "\n{$key}={$value}\n";
-
+        foreach($data as $k=>$val){
+            $contents .= "$k=$val\n";
         }
 
 
-        return static::writeFile($file_path, $contents);
+        file_put_contents($file_path, $contents);
     }
 
-    public static function clear($key, $file){
+    public static function clear($key, $file)
+    {
         static::set($key, null, $file);
 
     }
