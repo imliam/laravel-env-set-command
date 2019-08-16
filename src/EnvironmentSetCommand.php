@@ -12,7 +12,7 @@ class EnvironmentSetCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'env:set {key} {value?}';
+    protected $signature = 'env:set {key} {value?} {file=.env}';
 
     /**
      * The console command description.
@@ -44,7 +44,7 @@ class EnvironmentSetCommand extends Command
             return $this->error($e->getMessage());
         }
 
-        $envFilePath = app()->environmentFilePath();
+        $envFilePath = base_path($this->argument('file'));
         $contents = file_get_contents($envFilePath);
 
         if ($oldValue = $this->getOldValue($contents, $key)) {
