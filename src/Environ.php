@@ -86,11 +86,22 @@ class Environ extends Command
      */
     public static function getValue(string $envFile, string $key): string
     {
+        $contents = static::getFileContents($envFile, true);
+        
         // Match the given key at the beginning of a line
-        preg_match("/$key=(.*)$/", file_get_contents($envFile), $matches);
+        preg_match("/$key=(.*)$/", $contents, $matches);
 
         return $matches[1] ?? null;
     }
+    
+    public static function getFileContents($file, $create = false){
+        if(!file_exists($file)){
+            touch($file);
+        }
+        
+        return file_get_contents($file);
+    }
+    
 
     /**
      * Determine what the supplied key and value is from the current command.
