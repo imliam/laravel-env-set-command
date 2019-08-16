@@ -84,7 +84,7 @@ class Environ extends Command
      * @param string $envFile
      * @param string $key
      */
-    public static function getValue(string $envFile, string $key): string
+    public static function getValue(string $envFile, string $key)
     {
         $contents = static::getFileContents($envFile, true);
         
