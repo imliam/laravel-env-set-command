@@ -2,6 +2,7 @@
 
 namespace ImLiam\EnvironmentSetCommand;
 
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Console\Command;
 
@@ -48,7 +49,7 @@ class EnvironmentSetCommand extends Command
         $contents = file_get_contents($envFilePath);
 
         if ($oldValue = $this->getOldValue($contents, $key)) {
-            $contents = str_replace("{$key}={$oldValue}", "{$key}={$value}", $contents);
+            $contents = Str::replace("{$key}={$oldValue}", "{$key}={$value}", $contents);
             $this->writeFile($envFilePath, $contents);
 
             return $this->info("Environment variable with key '{$key}' has been changed from '{$oldValue}' to '{$value}'");
@@ -134,7 +135,7 @@ class EnvironmentSetCommand extends Command
      */
     protected function isValidKey(string $key): bool
     {
-        if (str_contains($key, '=')) {
+        if (Str::contains($key, '=')) {
             throw new InvalidArgumentException("Environment key should not contain '='");
         }
 
