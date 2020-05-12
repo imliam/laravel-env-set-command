@@ -17,13 +17,20 @@ php:
   - 7.3
   - 7.4
 
+jobs:
+  exclude:
+    -   php: 7.1
+        env: LARAVEL_VERSION="~6.0"
+    -   php: 7.1
+        env: LARAVEL_VERSION="~7.0"
+
 env:
-  - LARAVEL_VERSION="~5.3"
-  - LARAVEL_VERSION="~5.4"
-  - LARAVEL_VERSION="~5.5"
-  - LARAVEL_VERSION="~5.6"
-  - LARAVEL_VERSION="~5.7"
-  - LARAVEL_VERSION="~5.8"
+  - LARAVEL_VERSION="~5.3.0"
+  - LARAVEL_VERSION="~5.4.0"
+  - LARAVEL_VERSION="~5.5.0"
+  - LARAVEL_VERSION="~5.6.0"
+  - LARAVEL_VERSION="~5.7.0"
+  - LARAVEL_VERSION="~5.8.0"
   - LARAVEL_VERSION="~6.0"
   - LARAVEL_VERSION="~7.0"
 
