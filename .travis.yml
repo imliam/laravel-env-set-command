@@ -25,8 +25,6 @@ jobs:
         env: LARAVEL_VERSION="~7.0"
 
 env:
-  - LARAVEL_VERSION="~5.3.0"
-  - LARAVEL_VERSION="~5.4.0"
   - LARAVEL_VERSION="~5.5.0"
   - LARAVEL_VERSION="~5.6.0"
   - LARAVEL_VERSION="~5.7.0"

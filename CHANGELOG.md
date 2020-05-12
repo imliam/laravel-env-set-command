@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 
 
+## [1.1.3] - 2020-05-12
+### Security
+- roave/security-advisories finds laravel 5.3/5.4 not safe, so it is removed from the travis-ci config.
+
 ## [1.1.2] - 2020-05-12
 ### Fixed
 - Fixed travis-ci integration config.
@@ -35,6 +39,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial release
 
+[1.1.3]: https://github.com/imliam/laravel-env-set-command/compare/1.1.2...1.1.3
 [1.1.2]: https://github.com/imliam/laravel-env-set-command/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/imliam/laravel-env-set-command/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/imliam/laravel-env-set-command/compare/1.0.0...1.1.0
