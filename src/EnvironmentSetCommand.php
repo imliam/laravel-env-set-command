@@ -21,9 +21,9 @@ class EnvironmentSetCommand extends Command
      */
     protected $signature
         = self::COMMAND_NAME
-        . '{' . self::ARGUMENT_KEY . ' : Key or key=value pair}'
-        . '{' . self::ARGUMENT_VALUE . '? : Value}'
-        . '{' . self::ARGUMENT_ENV_FILE . '? : Optional path to the .env file}';
+        . ' {' . self::ARGUMENT_KEY . ' : Key or "key=value" pair}'
+        . ' {' . self::ARGUMENT_VALUE . '? : Value}'
+        . ' {' . self::ARGUMENT_ENV_FILE . '? : Optional path to the .env file}';
 
     /**
      * The console command description.
@@ -39,19 +39,23 @@ class EnvironmentSetCommand extends Command
     {
         try {
             // Parse key and value arguments.
-            [$key, $value] = $this->parseKeyValueArguments(
+            [$key, $value, $envFilePath] = $this->parseCommandArguments(
                 $this->argument(self::ARGUMENT_KEY),
-                $this->argument(self::ARGUMENT_VALUE)
+                $this->argument(self::ARGUMENT_VALUE),
+                $this->argument(self::ARGUMENT_ENV_FILE)
             );
+
+            // Use system env file path if the argument env file path is not provided.
+            $envFilePath = $envFilePath ?? App::environmentFilePath();
+            $this->info("The following environment file is used: '" . $envFilePath . "'");
         } catch (InvalidArgumentException $e) {
             $this->error($e->getMessage());
             return;
         }
 
-        $envFilePath = realpath($this->argument(self::ARGUMENT_ENV_FILE) ?? App::environmentFilePath());
         $content = file_get_contents($envFilePath);
-
         [$newEnvFileContent, $isNewVariableSet] = $this->setEnvVariable($content, $key, $value);
+
         if ($isNewVariableSet) {
             $this->info("A new environment variable with key '{$key}' has been set to '{$value}'");
         } else {
@@ -102,25 +106,36 @@ class EnvironmentSetCommand extends Command
     }
 
     /**
-     * Determine what the supplied key and value is from the current command.
+     * Parse key, value and path to .env-file from command line arguments.
      *
-     * @param string      $key
-     * @param string|null $value
+     * @param string      $_key
+     * @param string|null $_value
+     * @param string|null $_envFilePath
      *
-     * @return string[]
-     * @throws InvalidArgumentException
+     * @return string[] [string KEY, string value, ?string envFilePath].
      */
-    public function parseKeyValueArguments(string $key, ?string $value): array
+    public function parseCommandArguments(string $_key, ?string $_value, ?string $_envFilePath): array
     {
+        $key = null;
+        $value = null;
+        $envFilePath = null;
+
         // Parse "key=value" key argument.
-        if ($value === null) {
-            $parts = explode('=', $key, 2);
-            if (count($parts) !== 2) {
-                $key = $parts[0];
-                $value = '';
-            } else {
-                [$key, $value] = $parts;
+        if (preg_match('#^([^=]+)=(.*)$#umu', $_key, $matches)) {
+            [1 => $key, 2 => $value] = $matches;
+
+            // Use second argument as path to env file:
+            if ($_value !== null) {
+                $envFilePath = $_value;
             }
+        } else {
+            $key = $_key;
+            $value = $_value;
+        }
+
+        // If the path to env file is not set, use third argument or return null (default system path).
+        if ($envFilePath === null) {
+            $envFilePath = $_envFilePath;
         }
 
         $this->assertKeyIsValid($key);
@@ -130,7 +145,7 @@ class EnvironmentSetCommand extends Command
             $value = '"' . $value . '"';
         }
 
-        return [strtoupper($key), $value];
+        return [strtoupper($key), $value, ($envFilePath === null ? null : realpath($envFilePath))];
     }
 
     /**

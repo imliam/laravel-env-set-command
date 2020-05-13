@@ -57,15 +57,15 @@ class EnvironmentSetCommandTest extends TestCase
     }
 
     /**
-     * @covers       EnvironmentSetCommand::parseKeyValueArguments
+     * @covers       EnvironmentSetCommand::parseCommandArguments
      * @dataProvider parseKeyValueArgumentsDataProvider
      *
      * @param array $params
      * @param array $expectedResult
      */
-    public function testParseKeyValueArguments(array $params, array $expectedResult): void
+    public function testParseCommandArguments(array $params, array $expectedResult): void
     {
-        $result = $this->command->parseKeyValueArguments(...$params);
+        $result = $this->command->parseCommandArguments(...$params);
         $this->assertEquals($expectedResult, $result);
     }
 
@@ -219,81 +219,99 @@ class EnvironmentSetCommandTest extends TestCase
 
     /**
      * @return array
-     * @see EnvironmentSetCommandTest::testParseKeyValueArguments
+     * @see EnvironmentSetCommandTest::testParseCommandArguments
      */
     public function parseKeyValueArgumentsDataProvider(): array
     {
         return [
-            // Normal usage.
+            // Normal syntax.
             [
-                ['SOME_KEY=some_value', null],
-                ['SOME_KEY', 'some_value'],
+                ['SOME_KEY', 'some_value', null],
+                ['SOME_KEY', 'some_value', null],
             ],
             [
-                ['SOME_KEY=some_value', null],
-                ['SOME_KEY', 'some_value'],
+                ['SOME_KEY', 'some_value', __FILE__],
+                ['SOME_KEY', 'some_value', __FILE__],
+            ],
+            // key=value syntax.
+            [
+                ['SOME_KEY=some_value', null, null],
+                ['SOME_KEY', 'some_value', null],
+            ],
+            [
+                ['SOME_KEY=some_value', __FILE__, null],
+                ['SOME_KEY', 'some_value', __FILE__],
+            ],
+            [
+                ['SOME_KEY=some_value', __FILE__, 'ambiguous_third_parameter'],
+                ['SOME_KEY', 'some_value', __FILE__],
+            ],
+            // Equals signs in the key=value parameter.
+            [
+                ['SOME_KEY==some=value===', null, null],
+                ['SOME_KEY', '=some=value===', null],
             ],
             // Test without neither value argument nor value in the key.
             [
-                ['some_key=', null],
-                ['SOME_KEY', ''],
+                ['some_key=', null, null],
+                ['SOME_KEY', '', null],
             ],
             [
-                ['some_key', null],
-                ['SOME_KEY', ''],
+                ['some_key', null, null],
+                ['SOME_KEY', '', null],
             ],
             // Test lowercase in the key.
             [
-                ['some_key=some_value', null],
-                ['SOME_KEY', 'some_value'],
+                ['some_key=some_value', null, null],
+                ['SOME_KEY', 'some_value', null],
             ],
             [
-                ['some_key=some_value', null],
-                ['SOME_KEY', 'some_value'],
+                ['some_key=some_value', null, null],
+                ['SOME_KEY', 'some_value', null],
             ],
             // Test double quotes in value.
             [
-                ['some_key="some_value"', null],
-                ['SOME_KEY', '"some_value"'],
+                ['some_key="some_value"', null, null],
+                ['SOME_KEY', '"some_value"', null],
             ],
             [
-                ['some_key', '"some_value"'],
-                ['SOME_KEY', '"some_value"'],
+                ['some_key', '"some_value"', null],
+                ['SOME_KEY', '"some_value"', null],
             ],
             // Test single quotes in value.
             [
-                ["some_key='some_value'", null],
-                ['SOME_KEY', "'some_value'"],
+                ["some_key='some_value'", null, null],
+                ['SOME_KEY', "'some_value'", null],
             ],
             [
-                ['some_key', "'some_value'"],
-                ['SOME_KEY', "'some_value'"],
+                ['some_key', "'some_value'", null],
+                ['SOME_KEY', "'some_value'", null],
             ],
             // Test spaces in value.
             [
-                ['some_key=some value', null],
-                ['SOME_KEY', '"some value"'],
+                ['some_key=some value', null, null],
+                ['SOME_KEY', '"some value"', null],
             ],
             [
-                ['some_key', 'some value'],
-                ['SOME_KEY', '"some value"'],
+                ['some_key', 'some value', null],
+                ['SOME_KEY', '"some value"', null],
             ],
             // Test spaces in value that are enclosed in quotes.
             [
-                ['some_key="some value"', null],
-                ['SOME_KEY', '"some value"'],
+                ['some_key="some value"', null, null],
+                ['SOME_KEY', '"some value"', null],
             ],
             [
-                ['some_key', '"some value"'],
-                ['SOME_KEY', '"some value"'],
+                ['some_key', '"some value"', null],
+                ['SOME_KEY', '"some value"', null],
             ],
             [
-                ["some_key='some value'", null],
-                ['SOME_KEY', "'some value'"],
+                ["some_key='some value'", null, null],
+                ['SOME_KEY', "'some value'", null],
             ],
             [
-                ['some_key', "'some value'"],
-                ['SOME_KEY', "'some value'"],
+                ['some_key', "'some value'", null],
+                ['SOME_KEY', "'some value'", null],
             ],
         ];
     }
