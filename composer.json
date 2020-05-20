@@ -1,6 +1,6 @@
 {
-    "name": "imliam/laravel-env-set-command",
-    "description": "Set a .env file variable from the command line",
+    "name": "bottlenosecreative/laravel-env-set-command",
+    "description": "Set a .env file variable from the command line - forked from imliam",
     "keywords": [
         "imliam",
         "laravel-env-set-command",
