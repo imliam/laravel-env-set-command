@@ -49,9 +49,10 @@ class EnvironmentSetCommand extends Command
         $contents = file_get_contents($envFilePath);
 
         if ($oldValue = $this->getOldValue($contents, $key)) {
-            // Comment out previous value and insert new line underneath - preg_replace to get the "active" key not commented keys
-            $date = \Carbon\Carbon::now()->toDateTimeString();
-            $replace = "#{$key}={$oldValue} # Edited: {$date}\n{$key}={$value}";
+            
+            // Check if history is enabled, if so Comment out previous value and insert new line underneath
+            $date = new Date('y-m-d H:i:s');
+            $replace = env('ENVSET_HISTORY', false) ? "#{$key}={$oldValue} # Edited: {$date}\n{$key}={$value}" : "{$key}={$value}";
             $contents = preg_replace("/^{$key}={$oldValue}[^\r\n]*/m", $replace, $contents);
             
             // Store changes
