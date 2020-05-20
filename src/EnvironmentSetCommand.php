@@ -49,7 +49,13 @@ class EnvironmentSetCommand extends Command
         $contents = file_get_contents($envFilePath);
 
         if ($oldValue = $this->getOldValue($contents, $key)) {
-            $contents = str_replace("{$key}={$oldValue}", "{$key}={$value}", $contents);
+            // Comment out previous value and insert new line underneath
+            $date = \Carbon\Carbon::now()->toDateTimeString();
+            $contents = str_replace("{$key}={$oldValue}", "#{$key}={$oldValue} # Edited on: {$date}\n{$key}={$value}\n", $contents);
+            // Fix double comments
+            $contents = str_replace("##{$key}", "#{$key}", $contents);
+            
+            // Store changes
             $this->writeFile($envFilePath, $contents);
 
             return $this->info("Environment variable with key '{$key}' has been changed from '{$oldValue}' to '{$value}'");
@@ -87,7 +93,6 @@ class EnvironmentSetCommand extends Command
     {
         // Match the given key at the beginning of a line
         preg_match("/^{$key}=[^\r\n]*/m", $envFile, $matches);
-
         if (count($matches)) {
             return substr($matches[0], strlen($key) + 1);
         }
