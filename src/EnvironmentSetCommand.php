@@ -2,6 +2,7 @@
 
 namespace ImLiam\EnvironmentSetCommand;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
@@ -76,10 +77,15 @@ class EnvironmentSetCommand extends Command
      */
     public function setEnvVariable(string $envFileContent, string $key, string $value): array
     {
-        // For existed key.
+        // For existing key.
         $oldKeyValuePair = $this->readKeyValuePair($envFileContent, $key);
+
         if ($oldKeyValuePair !== null) {
-            return [str_replace($oldKeyValuePair, $key . '=' . $value, $envFileContent), false];
+            $historyString = $this->getHistoryString($oldKeyValuePair);
+
+            $updatedContent = preg_replace("/^{$oldKeyValuePair}[^\r\n]*/m", $historyString . $key . '=' . $value, $envFileContent);
+
+            return [$updatedContent, false];
         }
 
         // For a new key.
@@ -98,14 +104,8 @@ class EnvironmentSetCommand extends Command
     public function readKeyValuePair(string $envFileContent, string $key): ?string
     {
         // Match the given key at the beginning of a line
-<<<<<<< HEAD
-        preg_match("/^{$key}=[^\r\n]*/m", $envFile, $matches);
-        if (count($matches)) {
-            return substr($matches[0], strlen($key) + 1);
-=======
         if (preg_match("#^ *{$key} *= *[^\r\n]*$#imu", $envFileContent, $matches)) {
             return $matches[0];
->>>>>>> master
         }
 
         return null;
@@ -187,5 +187,23 @@ class EnvironmentSetCommand extends Command
     protected function writeFile(string $path, string $contents): bool
     {
         return (bool)file_put_contents($path, $contents, LOCK_EX);
+    }
+
+    /**
+     * Add history to a file.
+     *
+     * @param string $keyValuePair
+     *
+     * @return string
+     */
+    protected function getHistoryString(string $oldKeyValuePair = null): string
+    {
+        if (!env('ENVSET_HISTORY', false) || $oldKeyValuePair === null) {
+            // return '';
+        }
+
+        $date = Carbon::now()->format('Y-m-d H:i:s');
+
+        return "# {$oldKeyValuePair} # Edited: {$date}\n";
     }
 }
