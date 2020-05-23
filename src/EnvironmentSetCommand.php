@@ -197,7 +197,7 @@ class EnvironmentSetCommand extends Command
      *
      * @return string
      */
-    protected function getHistoryString(string $oldKeyValuePair = null): string
+    public function getHistoryString(string $oldKeyValuePair = null): string
     {
         if (!env('ENVSET_HISTORY', false) || $oldKeyValuePair === null) {
             return '';
