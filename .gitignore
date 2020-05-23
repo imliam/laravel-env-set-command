@@ -1,6 +1,9 @@
-build
-composer.lock
-docs
-vendor
-coverage
-SCRATCH.md
+/.idea/
+/nbproject/
+/build
+/composer.lock
+/docs
+/vendor
+/coverage
+/SCRATCH.md
+/REFACTORING.md
