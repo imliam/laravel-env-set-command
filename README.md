@@ -7,6 +7,8 @@
 
 Set a .env file variable from the command line.
 
+![Example command output](./screenshot.png)
+
 <!-- TOC -->
 
 - [Laravel `set:env` Command](#laravel-setenv-command)
