@@ -199,7 +199,7 @@ class EnvironmentSetCommand extends Command
     protected function getHistoryString(string $oldKeyValuePair = null): string
     {
         if (!env('ENVSET_HISTORY', false) || $oldKeyValuePair === null) {
-            // return '';
+            return '';
         }
 
         $date = Carbon::now()->format('Y-m-d H:i:s');
