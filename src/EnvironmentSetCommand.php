@@ -59,7 +59,7 @@ class EnvironmentSetCommand extends Command
         if ($isNewVariableSet) {
             $this->info("A new environment variable with key '{$key}' has been set to '{$value}'");
         } else {
-            [$_, $oldValue] = explode('=', $this->readKeyValuePair($content, $key));
+            [$_, $oldValue] = explode('=', $this->readKeyValuePair($content, $key), 2);
             $this->info("Environment variable with key '{$key}' has been changed from '{$oldValue}' to '{$value}'");
         }
 
