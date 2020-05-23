@@ -4,6 +4,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/imliam/laravel-env-set-command.svg)](https://packagist.org/packages/imliam/laravel-env-set-command)
 [![License](https://img.shields.io/github/license/imliam/laravel-env-set-command.svg)](LICENSE.md)
 [![Build Status](https://travis-ci.com/imliam/laravel-env-set-command.svg?branch=master)](https://travis-ci.com/imliam/laravel-env-set-command)
+[![CI Status](https://github.com/imliam/laravel-env-set-command/workflows/Run%20Tests/badge.svg)](https://github.com/imliam/laravel-env-set-command/actions)
 
 Set a .env file variable from the command line.
 
