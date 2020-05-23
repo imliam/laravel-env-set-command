@@ -83,6 +83,7 @@ class EnvironmentSetCommand extends Command
         if ($oldKeyValuePair !== null) {
             $historyString = $this->getHistoryString($oldKeyValuePair);
 
+            $oldKeyValuePair = preg_quote($oldKeyValuePair);
             $updatedContent = preg_replace("/^{$oldKeyValuePair}[^\r\n]*/m", $historyString . $key . '=' . $value, $envFileContent);
 
             return [$updatedContent, false];
