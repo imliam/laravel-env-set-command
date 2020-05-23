@@ -1,10 +1,13 @@
-# Laravel `set:env` Command
+# Laravel `env:set` Command
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/imliam/laravel-env-set-command.svg)](https://packagist.org/packages/imliam/laravel-env-set-command)
 [![Total Downloads](https://img.shields.io/packagist/dt/imliam/laravel-env-set-command.svg)](https://packagist.org/packages/imliam/laravel-env-set-command)
 [![License](https://img.shields.io/github/license/imliam/laravel-env-set-command.svg)](LICENSE.md)
+[![CI Status](https://github.com/imliam/laravel-env-set-command/workflows/Run%20Tests/badge.svg)](https://github.com/imliam/laravel-env-set-command/actions)
 
 Set a .env file variable from the command line.
+
+![Example command output](./screenshot.png)
 
 <!-- TOC -->
 
@@ -62,6 +65,19 @@ The command will do its best to stop any invalid inputs.
 ```bash
 $ php artisan env:set @pp_n@me Laravel
 # Invalid environment key. Only use letters and underscores
+```
+
+You can specify the external `.env` file in the third optional argument.
+
+```bash
+$ php artisan env:set APP_NAME TestApp /var/www/my_own_env.env
+# Environment variable with key 'APP_NAME' has been changed from 'Laravel' to 'TestApp'
+```
+
+Or in the second parameter if you use key=value syntax.
+```bash
+$ php artisan env:set APP_NAME=TestApp /var/www/my_own_env.env
+# Environment variable with key 'APP_NAME' has been changed from 'Laravel' to 'TestApp'
 ```
 
 ## Changelog

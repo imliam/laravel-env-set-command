@@ -2,18 +2,28 @@
 
 namespace ImLiam\EnvironmentSetCommand;
 
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Console\Command;
 
 class EnvironmentSetCommand extends Command
 {
+    public const COMMAND_NAME = 'env:set';
+    public const ARGUMENT_KEY = 'key';
+    public const ARGUMENT_VALUE = 'value';
+    public const ARGUMENT_ENV_FILE = 'env_file';
+
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'env:set {key} {value?}';
+    protected $signature
+        = self::COMMAND_NAME
+        . ' {' . self::ARGUMENT_KEY . ' : Key or "key=value" pair}'
+        . ' {' . self::ARGUMENT_VALUE . '? : Value}'
+        . ' {' . self::ARGUMENT_ENV_FILE . '? : Optional path to the .env file}';
 
     /**
      * The console command description.
@@ -23,48 +33,147 @@ class EnvironmentSetCommand extends Command
     protected $description = 'Set and save an environment variable in the .env file';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
+     * Execute the console command.
      */
-    public function __construct()
+    public function handle(): void
     {
-        parent::__construct();
+        try {
+            // Parse key and value arguments.
+            [$key, $value, $envFilePath] = $this->parseCommandArguments(
+                $this->argument(self::ARGUMENT_KEY),
+                $this->argument(self::ARGUMENT_VALUE),
+                $this->argument(self::ARGUMENT_ENV_FILE)
+            );
+
+            // Use system env file path if the argument env file path is not provided.
+            $envFilePath = $envFilePath ?? App::environmentFilePath();
+            $this->info("The following environment file is used: '" . $envFilePath . "'");
+        } catch (InvalidArgumentException $e) {
+            $this->error($e->getMessage());
+            return;
+        }
+
+        $content = file_get_contents($envFilePath);
+        [$newEnvFileContent, $isNewVariableSet] = $this->setEnvVariable($content, $key, $value);
+
+        if ($isNewVariableSet) {
+            $this->info("A new environment variable with key '{$key}' has been set to '{$value}'");
+        } else {
+            $this->info("Environment variable with key '{$key}' has been updated to '{$value}'");
+        }
+
+        $this->writeFile($envFilePath, $newEnvFileContent);
     }
 
     /**
-     * Execute the console command.
+     * Set or update env-variable.
      *
-     * @return mixed
+     * @param string $envFileContent Content of the .env file.
+     * @param string $key            Name of the variable.
+     * @param string $value          Value of the variable.
+     *
+     * @return array [string newEnvFileContent, bool isNewVariableSet].
      */
-    public function handle()
+    public function setEnvVariable(string $envFileContent, string $key, string $value): array
     {
-        try {
-            [$key, $value] = $this->getKeyValue();
-        } catch (\InvalidArgumentException $e) {
-            return $this->error($e->getMessage());
+        // For existed key.
+        $oldKeyValuePair = $this->readKeyValuePair($envFileContent, $key);
+        if ($oldKeyValuePair !== null) {
+            return [str_replace($oldKeyValuePair, $key . '=' . $value, $envFileContent), false];
         }
 
-        $envFilePath = app()->environmentFilePath();
-        $contents = file_get_contents($envFilePath);
+        // For a new key.
+        return [$envFileContent . "\n" . $key . '=' . $value . "\n", true];
+    }
 
-        if ($oldValue = $this->getOldValue($contents, $key)) {
-            
-            // Check if history is enabled, if so Comment out previous value and insert new line underneath
-            $date = new Date('y-m-d H:i:s');
-            $replace = env('ENVSET_HISTORY', false) ? "#{$key}={$oldValue} # Edited: {$date}\n{$key}={$value}" : "{$key}={$value}";
-            $contents = preg_replace("/^{$key}={$oldValue}[^\r\n]*/m", $replace, $contents);
-            
-            // Store changes
-            $this->writeFile($envFilePath, $contents);
-
-            return $this->info("Environment variable with key '{$key}' has been changed from '{$oldValue}' to '{$value}'");
+    /**
+     * Read the "key=value" string of a given key from an environment file.
+     * This function returns original "key=value" string and doesn't modify it.
+     *
+     * @param string $envFileContent
+     * @param string $key
+     *
+     * @return string|null Key=value string or null if the key is not exists.
+     */
+    public function readKeyValuePair(string $envFileContent, string $key): ?string
+    {
+        // Match the given key at the beginning of a line
+<<<<<<< HEAD
+        preg_match("/^{$key}=[^\r\n]*/m", $envFile, $matches);
+        if (count($matches)) {
+            return substr($matches[0], strlen($key) + 1);
+=======
+        if (preg_match("#^ *{$key} *= *[^\r\n]*$#imu", $envFileContent, $matches)) {
+            return $matches[0];
+>>>>>>> master
         }
 
-        $contents = $contents . "\n{$key}={$value}\n";
-        $this->writeFile($envFilePath, $contents);
+        return null;
+    }
 
-        return $this->info("A new environment variable with key '{$key}' has been set to '{$value}'");
+    /**
+     * Parse key, value and path to .env-file from command line arguments.
+     *
+     * @param string      $_key
+     * @param string|null $_value
+     * @param string|null $_envFilePath
+     *
+     * @return string[] [string KEY, string value, ?string envFilePath].
+     */
+    public function parseCommandArguments(string $_key, ?string $_value, ?string $_envFilePath): array
+    {
+        $key = null;
+        $value = null;
+        $envFilePath = null;
+
+        // Parse "key=value" key argument.
+        if (preg_match('#^([^=]+)=(.*)$#umu', $_key, $matches)) {
+            [1 => $key, 2 => $value] = $matches;
+
+            // Use second argument as path to env file:
+            if ($_value !== null) {
+                $envFilePath = $_value;
+            }
+        } else {
+            $key = $_key;
+            $value = $_value;
+        }
+
+        // If the path to env file is not set, use third argument or return null (default system path).
+        if ($envFilePath === null) {
+            $envFilePath = $_envFilePath;
+        }
+
+        $this->assertKeyIsValid($key);
+
+        // If the value contains spaces but not is not enclosed in quotes.
+        if (preg_match('#^[^\'"].*\s+.*[^\'"]$#um', $value)) {
+            $value = '"' . $value . '"';
+        }
+
+        return [strtoupper($key), $value, ($envFilePath === null ? null : realpath($envFilePath))];
+    }
+
+    /**
+     * Assert a given string is valid as an environment variable key.
+     *
+     * @param string $key
+     *
+     * @return bool Is key is valid.
+     */
+    public function assertKeyIsValid(string $key): bool
+    {
+        if (Str::contains($key, '=')) {
+            throw new InvalidArgumentException('Invalid environment key ' . $key
+                . "! Environment key should not contain '='");
+        }
+
+        if (!preg_match('/^[a-zA-Z_]+$/', $key)) {
+            throw new InvalidArgumentException('Invalid environment key ' . $key
+                . '! Only use letters and underscores');
+        }
+
+        return true;
     }
 
     /**
@@ -72,82 +181,11 @@ class EnvironmentSetCommand extends Command
      *
      * @param string $path
      * @param string $contents
+     *
      * @return boolean
      */
     protected function writeFile(string $path, string $contents): bool
     {
-        $file = fopen($path, 'w');
-        fwrite($file, $contents);
-
-        return fclose($file);
-    }
-
-    /**
-     * Get the old value of a given key from an environment file.
-     *
-     * @param string $envFile
-     * @param string $key
-     * @return string
-     */
-    protected function getOldValue(string $envFile, string $key): string
-    {
-        // Match the given key at the beginning of a line
-        preg_match("/^{$key}=[^\r\n]*/m", $envFile, $matches);
-        if (count($matches)) {
-            return substr($matches[0], strlen($key) + 1);
-        }
-
-        return '';
-    }
-
-    /**
-     * Determine what the supplied key and value is from the current command.
-     *
-     * @return array
-     */
-    protected function getKeyValue(): array
-    {
-        $key = $this->argument('key');
-        $value = $this->argument('value');
-
-        if (! $value) {
-            $parts = explode('=', $key, 2);
-
-            if (count($parts) !== 2) {
-                throw new InvalidArgumentException('No value was set');
-            }
-
-            $key = $parts[0];
-            $value = $parts[1];
-        }
-
-        if (! $this->isValidKey($key)) {
-            throw new InvalidArgumentException('Invalid argument key');
-        }
-
-        if (! is_bool(strpos($value, ' '))) {
-            $value = '"' . $value . '"';
-        }
-
-        return [strtoupper($key), $value];
-    }
-
-    /**
-     * Check if a given string is valid as an environment variable key.
-     *
-     * @param string $key
-     * @return boolean
-     */
-    protected function isValidKey(string $key): bool
-    {
-        if (Str::contains($key, '=')) {
-            throw new InvalidArgumentException("Environment key should not contain '='");
-        }
-
-        if (!preg_match('/^[a-zA-Z_]+$/', $key)) {
-            throw new InvalidArgumentException('Invalid environment key. Only use letters and underscores');
-        }
-
-        return true;
+        return (bool)file_put_contents($path, $contents, LOCK_EX);
     }
 }
