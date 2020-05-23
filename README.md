@@ -11,7 +11,7 @@ Set a .env file variable from the command line.
 
 <!-- TOC -->
 
-- [Laravel `set:env` Command](#laravel-setenv-command)
+- [Laravel `env:set` Command](#laravel-setenv-command)
     - [Installation](#installation)
     - [Usage](#usage)
     - [Changelog](#changelog)
