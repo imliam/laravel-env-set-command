@@ -50,7 +50,7 @@ The command will also create new environment variables if an existing one does n
 
 ```bash
 $ php artisan env:set editor=vscode
-# Environment variable with key 'EDITOR' has been set to 'vscode'
+# A new environment variable with key 'EDITOR' has been set to 'vscode'
 ```
 
 Instead of two arguments split by a space, you can also mimic the `.env` file format by supplying `KEY=VALUE`.
@@ -64,7 +64,7 @@ The command will do its best to stop any invalid inputs.
 
 ```bash
 $ php artisan env:set @pp_n@me Laravel
-# Invalid environment key. Only use letters and underscores
+# Invalid environment key @pp_n@me! Only use letters and underscores
 ```
 
 You can specify the external `.env` file in the third optional argument.
