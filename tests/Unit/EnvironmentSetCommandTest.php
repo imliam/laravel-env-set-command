@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use Carbon\Carbon;
 use ImLiam\EnvironmentSetCommand\EnvironmentSetCommand;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -83,6 +84,25 @@ class EnvironmentSetCommandTest extends TestCase
         }
 
         $this->assertTrue($this->command->assertKeyIsValid($key));
+    }
+
+    /**
+     * @covers EnvironmentSetCommand::getHistoryString
+     */
+    public function testHistoryString(): void
+    {
+        $this->assertEquals('', $this->command->getHistoryString('old_key=old_value'));
+
+        putenv('ENVSET_HISTORY=true');
+
+        Carbon::setTestNow('2020-01-01 12:00:00');
+
+        $this->assertEquals(
+            "# old_key=old_value # Edited: 2020-01-01 12:00:00\n",
+            $this->command->getHistoryString('old_key=old_value')
+        );
+
+        putenv('ENVSET_HISTORY');
     }
 
     /**
