@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 
 
+## [1.1.5] - 2020-05-26
+### Fixed
+- Fixed working with nested key names (for example, APP_KEY and PUSHER_APP_KEY).
+
 ## [1.1.4] - 2020-05-13
 ### Added
 - Added the command description.
@@ -47,6 +51,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial release
 
+[1.1.5]: https://github.com/imliam/laravel-env-set-command/compare/1.1.4...1.1.5
 [1.1.4]: https://github.com/imliam/laravel-env-set-command/compare/1.1.3...1.1.4
 [1.1.3]: https://github.com/imliam/laravel-env-set-command/compare/1.1.2...1.1.3
 [1.1.2]: https://github.com/imliam/laravel-env-set-command/compare/1.1.1...1.1.2
