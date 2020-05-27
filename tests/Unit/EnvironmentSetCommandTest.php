@@ -43,6 +43,26 @@ class EnvironmentSetCommandTest extends TestCase
     }
 
     /**
+     * @covers EnvironmentSetCommand::setEnvVariable
+     */
+    public function testSetEnvVariableTestOfNestedKeys(): void
+    {
+        // APP_KEY is a subset of PUSHER_APP_KEY:
+        $env = '# it is a comment' . "\n"
+            . 'APP_KEY=' . "\n"
+            . 'PUSHER_APP_KEY=' . "\n"
+            . 'some_key=some_value' . "\n";
+
+        $expectedEnv = '# it is a comment' . "\n"
+            . 'APP_KEY=test' . "\n"
+            . 'PUSHER_APP_KEY=' . "\n"
+            . 'some_key=some_value' . "\n";
+
+        [$newEnv, $_] = $this->command->setEnvVariable($env, 'APP_KEY', 'test');
+        $this->assertEquals($expectedEnv, $newEnv);
+    }
+
+    /**
      * @covers       EnvironmentSetCommand::readKeyValuePair
      * @dataProvider readKeyValuePairDataProvider
      *
@@ -91,6 +111,7 @@ class EnvironmentSetCommandTest extends TestCase
      */
     public function setEnvVariableDataProvider(): array
     {
+        // Unfortunately, we can't test nested key names using str_replace().
         $envFileContent = $this->getTestEnvFile();
         return [
             [

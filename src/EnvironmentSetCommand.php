@@ -77,14 +77,17 @@ class EnvironmentSetCommand extends Command
      */
     public function setEnvVariable(string $envFileContent, string $key, string $value): array
     {
+        $oldPair = $this->readKeyValuePair($envFileContent, $key);
+        $newPair = $key . '=' . $value;
+
         // For existed key.
-        $oldKeyValuePair = $this->readKeyValuePair($envFileContent, $key);
-        if ($oldKeyValuePair !== null) {
-            return [str_replace($oldKeyValuePair, $key . '=' . $value, $envFileContent), false];
+        if ($oldPair !== null) {
+            $replaced = preg_replace('/^' . preg_quote($oldPair, '/') . '$/uimU', $newPair, $envFileContent);
+            return [$replaced, false];
         }
 
         // For a new key.
-        return [$envFileContent . "\n" . $key . '=' . $value . "\n", true];
+        return [$envFileContent . "\n" . $newPair . "\n", true];
     }
 
     /**
@@ -99,7 +102,7 @@ class EnvironmentSetCommand extends Command
     public function readKeyValuePair(string $envFileContent, string $key): ?string
     {
         // Match the given key at the beginning of a line
-        if (preg_match("#^ *{$key} *= *[^\r\n]*$#imu", $envFileContent, $matches)) {
+        if (preg_match("#^ *{$key} *= *[^\r\n]*$#uimU", $envFileContent, $matches)) {
             return $matches[0];
         }
 
@@ -122,7 +125,7 @@ class EnvironmentSetCommand extends Command
         $envFilePath = null;
 
         // Parse "key=value" key argument.
-        if (preg_match('#^([^=]+)=(.*)$#umu', $_key, $matches)) {
+        if (preg_match('#^([^=]+)=(.*)$#umU', $_key, $matches)) {
             [1 => $key, 2 => $value] = $matches;
 
             // Use second argument as path to env file:
@@ -142,7 +145,7 @@ class EnvironmentSetCommand extends Command
         $this->assertKeyIsValid($key);
 
         // If the value contains spaces but not is not enclosed in quotes.
-        if (preg_match('#^[^\'"].*\s+.*[^\'"]$#um', $value)) {
+        if (preg_match('#^[^\'"].*\s+.*[^\'"]$#umU', $value)) {
             $value = '"' . $value . '"';
         }
 
