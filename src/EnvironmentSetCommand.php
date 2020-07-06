@@ -78,7 +78,7 @@ class EnvironmentSetCommand extends Command
     public function setEnvVariable(string $envFileContent, string $key, string $value): array
     {
         $oldPair = $this->readKeyValuePair($envFileContent, $key);
-        $newPair = $key . '=' . $value;
+        $newPair = $key . '="' . $value . '"';
 
         // For existed key.
         if ($oldPair !== null) {
