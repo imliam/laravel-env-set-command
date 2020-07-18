@@ -181,7 +181,14 @@ class EnvironmentSetCommandTest extends TestCase
                 'some_key',
                 '=========',
                 str_replace('some_key=some_value',
-                    'some_key==========', $envFileContent),
+                    'some_key="========="', $envFileContent),
+            ],
+            [
+                &$envFileContent,
+                'value_with_spaces',
+                'this is a value',
+                str_replace('value_with_spaces=',
+                    'value_with_spaces="this is a value"', $envFileContent),
             ],
         ];
     }
@@ -353,6 +360,7 @@ class EnvironmentSetCommandTest extends TestCase
             . '    spaces_in_the_quotes    =    "    "    ' . "\n"
             . 'a_lot_of_equals_signs_one=======' . "\n"
             . 'a_lot_of_equals_signs_two    =    ======    ' . "\n"
-            . 'a_lot_of_equals_signs_three    =    "======"    ' . "\n";
+            . 'a_lot_of_equals_signs_three    =    "======"    ' . "\n"
+            . 'value_with_spaces=' . "\n";
     }
 }
