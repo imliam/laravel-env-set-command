@@ -78,6 +78,12 @@ class EnvironmentSetCommand extends Command
     public function setEnvVariable(string $envFileContent, string $key, string $value): array
     {
         $oldPair = $this->readKeyValuePair($envFileContent, $key);
+
+        // Wrap values that have a space or equals in quotes to escape them
+        if (preg_match('/\s/',$value) || strpos($value, '=') !== false) {
+            $value = '"' . $value . '"';
+        }
+
         $newPair = $key . '=' . $value;
 
         // For existed key.
