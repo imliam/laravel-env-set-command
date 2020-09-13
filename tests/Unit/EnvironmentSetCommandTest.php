@@ -16,7 +16,7 @@ class EnvironmentSetCommandTest extends TestCase
      */
     protected $command;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->command = new EnvironmentSetCommand();
