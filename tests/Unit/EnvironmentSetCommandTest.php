@@ -71,6 +71,19 @@ class EnvironmentSetCommandTest extends TestCase
     }
 
     /**
+     * @covers EnvironmentSetCommand::setEnvVariable
+     */
+    public function testQuotedCharactersArePreserved(): void
+    {
+        $env = 'APP_NAME=' . "\n";
+
+        $expectedEnv = 'APP_NAME="MY.NAME & C."' . "\n";
+
+        [$newEnv, $_] = $this->command->setEnvVariable($env, 'APP_NAME', 'MY.NAME & C.');
+        $this->assertEquals($expectedEnv, $newEnv);
+    }
+
+    /**
      * @covers       EnvironmentSetCommand::readKeyValuePair
      * @dataProvider readKeyValuePairDataProvider
      */
