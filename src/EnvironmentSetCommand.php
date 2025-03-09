@@ -80,8 +80,9 @@ class EnvironmentSetCommand extends Command
         $oldPair = $this->readKeyValuePair($envFileContent, $key);
 
         // Wrap values that have a space or equals in quotes to escape them
-        if (preg_match('/\s/',$value) || strpos($value, '=') !== false) {
-            $value = '"' . $value . '"';
+        $trimmedValue = trim($value);
+        if (!str_starts_with($trimmedValue, '"') && !str_ends_with($trimmedValue, '"') && preg_match('/\s/',$value) || strpos($value, '=') !== false) {
+            $value = '"' . str_replace('"', '\"', $value) . '"';
         }
 
         $newPair = $key . '=' . $value;
