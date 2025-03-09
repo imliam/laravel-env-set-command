@@ -106,13 +106,12 @@ class EnvironmentSetCommandTest extends TestCase
     }
 
     /**
-     * @return array
      * @see EnvironmentSetCommandTest::testSetEnvVariable
      */
-    public function setEnvVariableDataProvider(): array
+    public static function setEnvVariableDataProvider(): array
     {
         // Unfortunately, we can't test nested key names using str_replace().
-        $envFileContent = $this->getTestEnvFile();
+        $envFileContent = static::getTestEnvFile();
         return [
             [
                 &$envFileContent,
@@ -194,12 +193,11 @@ class EnvironmentSetCommandTest extends TestCase
     }
 
     /**
-     * @return array
      * @see EnvironmentSetCommandTest::testReadKeyValuePair
      */
-    public function readKeyValuePairDataProvider(): array
+    public static function readKeyValuePairDataProvider(): array
     {
-        $envFileContent = $this->getTestEnvFile();
+        $envFileContent = static::getTestEnvFile();
         return [
             [&$envFileContent, 'not_existed_key', null],
             [&$envFileContent, 'some_key', 'some_key=some_value'],
@@ -220,10 +218,9 @@ class EnvironmentSetCommandTest extends TestCase
     }
 
     /**
-     * @return array
      * @see EnvironmentSetCommandTest::testAssertKeyIsValid
      */
-    public function assertKeyIsValidDataProvider(): array
+    public static function assertKeyIsValidDataProvider(): array
     {
         return [
             // Wrong keys
@@ -246,10 +243,9 @@ class EnvironmentSetCommandTest extends TestCase
     }
 
     /**
-     * @return array
      * @see EnvironmentSetCommandTest::testParseCommandArguments
      */
-    public function parseKeyValueArgumentsDataProvider(): array
+    public static function parseKeyValueArgumentsDataProvider(): array
     {
         return [
             // Normal syntax.
@@ -344,10 +340,7 @@ class EnvironmentSetCommandTest extends TestCase
         ];
     }
 
-    /**
-     * @return string
-     */
-    protected function getTestEnvFile(): string
+    protected static function getTestEnvFile(): string
     {
         return 'some_key=some_value' . "\n"
             . '   spaces_at_the_beginning_of_the_line=42442' . "\n"
