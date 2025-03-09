@@ -26,7 +26,7 @@ Set a .env file variable from the command line.
 You can install the package with [Composer](https://getcomposer.org/) using the following command:
 
 ```bash
-composer require imliam/laravel-env-set-command:^1.0
+composer require imliam/laravel-env-set-command
 ```
 
 ## Usage
