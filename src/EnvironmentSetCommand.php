@@ -108,7 +108,7 @@ class EnvironmentSetCommand extends Command
     public function readKeyValuePair(string $envFileContent, string $key): ?string
     {
         // Match the given key at the beginning of a line
-        if (preg_match("#^ *{$key} *= *[^\r\n]*$#uimU", $envFileContent, $matches)) {
+        if (preg_match("#^\s*{$key}\s*=\s*[^\r\n]*$#uimU", $envFileContent, $matches)) {
             return $matches[0];
         }
 

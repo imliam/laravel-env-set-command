@@ -25,11 +25,6 @@ class EnvironmentSetCommandTest extends TestCase
     /**
      * @covers       EnvironmentSetCommand::setEnvVariable
      * @dataProvider setEnvVariableDataProvider
-     *
-     * @param string $originalEnvFileContent
-     * @param string $key
-     * @param string $value
-     * @param string $expectedNewEnvFile
      */
     public function testSetEnvVariable(
         string $originalEnvFileContent,
@@ -63,14 +58,23 @@ class EnvironmentSetCommandTest extends TestCase
     }
 
     /**
+     * @covers EnvironmentSetCommand::setEnvVariable
+     */
+    public function testWhitespaceAsValueDoesntCreateNewEntry(): void
+    {
+        $env = 'APP_KEY = \t' . "\n";
+
+        $expectedEnv = 'APP_KEY=test' . "\n";
+
+        [$newEnv, $_] = $this->command->setEnvVariable($env, 'APP_KEY', 'test');
+        $this->assertEquals($expectedEnv, $newEnv);
+    }
+
+    /**
      * @covers       EnvironmentSetCommand::readKeyValuePair
      * @dataProvider readKeyValuePairDataProvider
-     *
-     * @param string      $envFileContent
-     * @param string      $key
-     * @param string|null $expectedKeyValuePair
      */
-    public function testReadKeyValuePair(string $envFileContent, string $key, ?string $expectedKeyValuePair): void
+    public function testReadKeyValuePair(string $envFileContent, string $key, ?string $expectedKeyValuePair = null): void
     {
         $realPair = $this->command->readKeyValuePair($envFileContent, $key);
         $this->assertEquals($expectedKeyValuePair, $realPair);
@@ -92,9 +96,6 @@ class EnvironmentSetCommandTest extends TestCase
     /**
      * @covers       EnvironmentSetCommand::assertKeyIsValid
      * @dataProvider assertKeyIsValidDataProvider
-     *
-     * @param string $key
-     * @param bool   $isGood
      */
     public function testAssertKeyIsValid(string $key, bool $isGood): void
     {
