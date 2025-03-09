@@ -46,7 +46,7 @@ class EnvironmentSetCommand extends Command
             );
 
             // Use system env file path if the argument env file path is not provided.
-            $envFilePath = $envFilePath ?? App::environmentFilePath();
+            $envFilePath = $envFilePath ?: App::environmentFilePath();
             $this->info("The following environment file is used: '" . $envFilePath . "'");
         } catch (InvalidArgumentException $e) {
             $this->error($e->getMessage());
